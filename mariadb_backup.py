@@ -31,8 +31,8 @@ def maria_backup():
 # 다른 날일 경우 증분 백업
     else:
         print('===Increment Backup===')
-        full_cmd = ('ls -r /data/backup/full/ | sed -n 1p')
-        inc_cmd = ('ls -r /data/backup/inc/ | sed -n 1p')
+        full_cmd = ('ls -r ' + FULL_BACKUP_DIR + ' | sed -n 1p')
+        inc_cmd = ('ls -r ' + INC_BACKUP_DIR + ' | sed -n 1p')
         last_full_backup = commands.getoutput(full_cmd)
         last_inc_backup = commands.getoutput(inc_cmd)
 
@@ -48,8 +48,8 @@ def maria_backup():
             print('full 백업으로 증분 백업')
             os.system('mariabackup --backup --compress --no-lock --target-dir=' + INC_BACKUP_DIR + str(now.strftime("%Y-%m-%d_%H:%M:%S")) + ' --incremental-basedir=' + FULL_BACKUP_DIR + last_full_backup + ' --user=' + DB_USER + ' --password=' + DB_PASS)
             sys.exit()
-# Full 백업과 증분백업의 날짜를 비교 Full 백업의 날짜가 오래됐을 경우 Full 백업을 기준으로 증분 백업을 진행
-# 증분 백업의 날짜가 오래됬을 경우 증분 백업을 기준으로 증분 백업 진행
+# Full 백업과 증분백업의 날짜를 비교 Full 백업의 날짜가 최근일 경우 Full 백업을 기준으로 증분 백업을 진행
+# 증분 백업의 날짜가 최근일을 경우 증분 백업을 기준으로 증분 백업 진행
         convert_inc = datetime.datetime.strptime(last_inc_backup, "%Y-%m-%d_%H:%M:%S").date()
         convert_full = datetime.datetime.strptime(last_full_backup, "%Y-%m-%d_%H:%M:%S").date()
         if convert_full > convert_inc:
